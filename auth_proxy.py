@@ -47,91 +47,199 @@ LOGIN_HTML = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hermes Agent — Login</title>
+<title>Hermes Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #111110;
+    --surface: #1a1a18;
+    --border: rgba(255,255,255,0.06);
+    --border-focus: rgba(196,172,128,0.4);
+    --text: #e8e6e1;
+    --text-muted: #807d74;
+    --accent: #c4ac80;
+    --accent-dim: rgba(196,172,128,0.1);
+    --error-bg: rgba(180,60,60,0.1);
+    --error-border: rgba(180,60,60,0.25);
+    --error-text: #d4908a;
+  }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #0a0f14;
-    color: #e0f0f0;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(196,172,128,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 100%, rgba(255,255,255,0.02) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes lineGrow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  .login-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    padding: 0 1.5rem;
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .brand {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 1.2rem;
+    border: 1.5px solid var(--accent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    opacity: 0;
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  }
+  .brand h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 1.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0;
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  }
+  .brand p {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+  }
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-focus), transparent);
+    margin-bottom: 2.5rem;
+    transform-origin: center;
+    animation: lineGrow 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
   }
   .card {
-    background: #111920;
-    border: 1px solid rgba(45, 212, 191, 0.15);
-    border-radius: 12px;
-    padding: 2.5rem;
-    width: 100%;
-    max-width: 380px;
-    box-shadow: 0 0 40px rgba(45, 212, 191, 0.05);
+    opacity: 0;
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
   }
-  h1 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    color: #2dd4bf;
+  .field {
+    margin-bottom: 1.25rem;
   }
   label {
     display: block;
-    font-size: 0.8rem;
-    color: #7899aa;
-    margin-bottom: 0.3rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
   }
   input {
     width: 100%;
-    padding: 0.6rem 0.8rem;
-    margin-bottom: 1rem;
-    background: #0a0f14;
-    border: 1px solid rgba(45, 212, 191, 0.2);
-    border-radius: 6px;
-    color: #e0f0f0;
-    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.3s, box-shadow 0.3s;
   }
-  input:focus { border-color: #2dd4bf; }
+  input::placeholder { color: var(--text-muted); opacity: 0.5; }
+  input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
   button {
     width: 100%;
-    padding: 0.7rem;
-    background: #2dd4bf;
-    color: #0a0f14;
+    padding: 0.8rem;
+    margin-top: 0.5rem;
+    background: var(--accent);
+    color: var(--bg);
     border: none;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-  button:hover { opacity: 0.85; }
-  .error {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #fca5a5;
-    padding: 0.5rem 0.8rem;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
     font-size: 0.85rem;
-    margin-bottom: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  button:hover { opacity: 0.88; transform: translateY(-1px); }
+  button:active { transform: translateY(0); }
+  .error {
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    color: var(--error-text);
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 1.25rem;
     text-align: center;
   }
 </style>
 </head>
 <body>
-<div class="card">
-  <h1>Hermes Agent</h1>
-  $error
-  <form method="POST" action="/login">
-    <label for="username">Username</label>
-    <input id="username" name="username" type="text" autocomplete="username" required>
-    <label for="password">Password</label>
-    <input id="password" name="password" type="password" autocomplete="current-password" required>
-    <button type="submit">Sign in</button>
-  </form>
+<div class="login-wrapper">
+  <div class="brand">
+    <div class="brand-icon">H</div>
+    <h1>Hermes</h1>
+    <p>Agent Console</p>
+  </div>
+  <div class="divider"></div>
+  <div class="card">
+    $error
+    <form method="POST" action="/login">
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit">Continue</button>
+    </form>
+  </div>
 </div>
 </body>
 </html>"""
