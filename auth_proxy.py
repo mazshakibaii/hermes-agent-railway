@@ -5,6 +5,7 @@ import hashlib
 import hmac
 import os
 import secrets
+import string
 import sys
 import time
 
@@ -121,7 +122,7 @@ LOGIN_HTML = """<!DOCTYPE html>
 <body>
 <div class="card">
   <h1>Hermes Agent</h1>
-  {error}
+  $error
   <form method="POST" action="/login">
     <label for="username">Username</label>
     <input id="username" name="username" type="text" autocomplete="username" required>
@@ -139,7 +140,7 @@ async def login_page(request):
     if request.query.get("error"):
         error = '<div class="error">Invalid username or password</div>'
     return web.Response(
-        text=LOGIN_HTML.format(error=error),
+        text=string.Template(LOGIN_HTML).safe_substitute(error=error),
         content_type="text/html",
     )
 
