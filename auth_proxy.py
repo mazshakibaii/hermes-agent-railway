@@ -6,6 +6,7 @@ import hmac
 import os
 import secrets
 import string
+import subprocess
 import sys
 import time
 
@@ -178,6 +179,60 @@ async def auth_middleware(request, handler):
     return await handler(request)
 
 
+gateway_process = None
+
+
+def start_gateway():
+    global gateway_process
+    if gateway_process and gateway_process.poll() is None:
+        gateway_process.terminate()
+        try:
+            gateway_process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            gateway_process.kill()
+    gateway_process = subprocess.Popen(["hermes", "gateway", "run"])
+
+
+async def restart_gateway(request):
+    start_gateway()
+    return web.json_response({"status": "gateway restarted"})
+
+
+async def gateway_status(request):
+    running = gateway_process is not None and gateway_process.poll() is None
+    return web.json_response({"running": running})
+
+
+GATEWAY_WIDGET = """
+<div id="gw-widget" style="position:fixed;bottom:20px;right:20px;z-index:99999;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;">
+  <div style="background:#111920;border:1px solid rgba(45,212,191,0.2);border-radius:10px;
+    padding:12px 16px;display:flex;align-items:center;gap:10px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.4);">
+    <span id="gw-dot" style="width:8px;height:8px;border-radius:50%;background:#888;flex-shrink:0;"></span>
+    <span id="gw-label" style="color:#7899aa;">Gateway</span>
+    <button id="gw-btn" onclick="gwRestart()" style="background:#2dd4bf;color:#0a0f14;border:none;
+      border-radius:5px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">Restart</button>
+  </div>
+</div>
+<script>
+function gwStatus(){
+  fetch('/api/gateway/status').then(r=>r.json()).then(d=>{
+    document.getElementById('gw-dot').style.background=d.running?'#4ade80':'#ef4444';
+    document.getElementById('gw-label').textContent=d.running?'Gateway running':'Gateway stopped';
+  }).catch(()=>{});
+}
+function gwRestart(){
+  var b=document.getElementById('gw-btn');b.textContent='Restarting...';b.disabled=true;
+  fetch('/api/gateway/restart',{method:'POST'}).then(()=>{
+    setTimeout(()=>{b.textContent='Restart';b.disabled=false;gwStatus();},3000);
+  }).catch(()=>{b.textContent='Restart';b.disabled=false;});
+}
+gwStatus();setInterval(gwStatus,10000);
+</script>
+"""
+
+
 async def health(request):
     return web.json_response({"status": "ok"})
 
@@ -227,15 +282,27 @@ async def proxy(request):
             excluded = {"transfer-encoding", "content-encoding", "content-length"}
             proxy_headers = {k: v for k, v in resp.headers.items() if k.lower() not in excluded}
             content = await resp.read()
+            content_type = resp.headers.get("content-type", "")
+            if "text/html" in content_type:
+                html = content.decode("utf-8", errors="replace")
+                html = html.replace("</body>", GATEWAY_WIDGET + "</body>")
+                return web.Response(status=resp.status, headers=proxy_headers, text=html, content_type="text/html")
             return web.Response(status=resp.status, headers=proxy_headers, body=content)
+
+
+async def on_startup(app):
+    start_gateway()
 
 
 def create_app():
     app = web.Application(middlewares=[auth_middleware])
+    app.on_startup.append(on_startup)
     app.router.add_get("/login", login_page)
     app.router.add_post("/login", login_post)
     app.router.add_get("/logout", logout)
     app.router.add_get("/api/health", health)
+    app.router.add_post("/api/gateway/restart", restart_gateway)
+    app.router.add_get("/api/gateway/status", gateway_status)
     app.router.add_route("*", "/{path_info:.*}", proxy)
     return app
 
