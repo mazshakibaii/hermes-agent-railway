@@ -1,3 +1,5 @@
+![Hermes Agent](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/assets/banner.png)
+
 # Deploy and Host Hermes Agent (with Official Dashboard) on Railway
 
 Hermes Agent is an open-source AI agent by Nous Research with tool use, persistent memory, scheduled tasks, and multi-platform messaging. This template deploys the full agent with its official web dashboard, a Telegram/Discord/Slack messaging gateway, password-protected login, and automatic updates.
