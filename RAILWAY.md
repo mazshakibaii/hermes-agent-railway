@@ -2,11 +2,11 @@
 
 # Deploy Your Own Hermes Agent
 
-Hermes Agent is an open-source AI agent by Nous Research with tool use, persistent memory, scheduled tasks, and multi-platform messaging. This template deploys the full agent with its official web dashboard, a Telegram/Discord/Slack messaging gateway, password-protected login, and automatic updates.
+Your own AI agent, running 24/7, talking to you on Telegram. Think OpenClaw, but **better**. Hermes Agent by Nous Research comes with tool use, persistent memory, scheduled tasks, and multi-platform messaging — and this template gives you the whole thing with one click.
 
 ## About
 
-This template gives you a fully managed Hermes Agent accessible from your browser. Everything is configured through the web dashboard after deploy — add API keys, connect messaging platforms, manage sessions, view analytics, and schedule cron jobs without ever touching a terminal. The messaging gateway runs alongside the dashboard and automatically restarts when you change settings. A Railway volume keeps your data across redeploys.
+No YAML files. No SSH. No "just clone the repo and figure it out." This template gives you a fully managed Hermes Agent accessible from your browser. Add API keys, connect messaging platforms, manage sessions, view analytics, and schedule cron jobs — all from the dashboard. The messaging gateway runs alongside it and automatically restarts when you change settings. Attach a Railway volume and your data sticks around forever.
 
 ## Getting Started
 
