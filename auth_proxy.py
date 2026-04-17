@@ -12,6 +12,7 @@ import time
 
 from aiohttp import web, ClientSession, WSMsgType
 
+HERMES_HOME = "/root/.hermes"
 UPSTREAM = "http://127.0.0.1:9119"
 USERNAME = os.environ.get("DASHBOARD_USER", "admin")
 PASSWORD = os.environ.get("DASHBOARD_PASSWORD", "")
@@ -193,6 +194,17 @@ def start_gateway():
     gateway_process = subprocess.Popen(["hermes", "gateway", "run"])
 
 
+RESTART_PATHS = {
+    ("PUT", "/api/config"),
+    ("PUT", "/api/env"),
+    ("DELETE", "/api/env"),
+}
+
+
+def volume_attached():
+    return os.path.ismount(HERMES_HOME)
+
+
 async def restart_gateway(request):
     start_gateway()
     return web.json_response({"status": "gateway restarted"})
@@ -200,19 +212,25 @@ async def restart_gateway(request):
 
 async def gateway_status(request):
     running = gateway_process is not None and gateway_process.poll() is None
-    return web.json_response({"running": running})
+    return web.json_response({
+        "running": running,
+        "volume": volume_attached(),
+    })
 
 
 GATEWAY_WIDGET = """
 <div id="gw-widget" style="position:fixed;bottom:20px;right:20px;z-index:99999;
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;">
   <div style="background:#111920;border:1px solid rgba(45,212,191,0.2);border-radius:10px;
-    padding:12px 16px;display:flex;align-items:center;gap:10px;
-    box-shadow:0 4px 20px rgba(0,0,0,0.4);">
-    <span id="gw-dot" style="width:8px;height:8px;border-radius:50%;background:#888;flex-shrink:0;"></span>
-    <span id="gw-label" style="color:#7899aa;">Gateway</span>
-    <button id="gw-btn" onclick="gwRestart()" style="background:#2dd4bf;color:#0a0f14;border:none;
-      border-radius:5px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">Restart</button>
+    padding:12px 16px;display:flex;flex-direction:column;gap:8px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.4);min-width:180px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span id="gw-dot" style="width:8px;height:8px;border-radius:50%;background:#888;flex-shrink:0;"></span>
+      <span id="gw-label" style="color:#7899aa;flex:1;">Gateway</span>
+      <button id="gw-btn" onclick="gwRestart()" style="background:#2dd4bf;color:#0a0f14;border:none;
+        border-radius:5px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">Restart</button>
+    </div>
+    <div id="gw-vol" style="display:none;font-size:11px;padding-top:4px;border-top:1px solid rgba(45,212,191,0.1);"></div>
   </div>
 </div>
 <script>
@@ -220,6 +238,13 @@ function gwStatus(){
   fetch('/api/gateway/status').then(r=>r.json()).then(d=>{
     document.getElementById('gw-dot').style.background=d.running?'#4ade80':'#ef4444';
     document.getElementById('gw-label').textContent=d.running?'Gateway running':'Gateway stopped';
+    var vol=document.getElementById('gw-vol');
+    vol.style.display='block';
+    if(d.volume){
+      vol.innerHTML='<span style="color:#4ade80;">&#x2713;</span> <span style="color:#7899aa;">Volume attached</span>';
+    }else{
+      vol.innerHTML='<span style="color:#fbbf24;">&#x26A0;</span> <span style="color:#fbbf24;">No volume \u2014 data will not persist</span>';
+    }
   }).catch(()=>{});
 }
 function gwRestart(){
@@ -282,6 +307,9 @@ async def proxy(request):
             excluded = {"transfer-encoding", "content-encoding", "content-length"}
             proxy_headers = {k: v for k, v in resp.headers.items() if k.lower() not in excluded}
             content = await resp.read()
+            if (request.method, request.path) in RESTART_PATHS and resp.status < 400:
+                start_gateway()
+
             content_type = resp.headers.get("content-type", "")
             if "text/html" in content_type:
                 html_headers = {k: v for k, v in proxy_headers.items() if k.lower() != "content-type"}
