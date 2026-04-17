@@ -284,9 +284,10 @@ async def proxy(request):
             content = await resp.read()
             content_type = resp.headers.get("content-type", "")
             if "text/html" in content_type:
+                html_headers = {k: v for k, v in proxy_headers.items() if k.lower() != "content-type"}
                 html = content.decode("utf-8", errors="replace")
                 html = html.replace("</body>", GATEWAY_WIDGET + "</body>")
-                return web.Response(status=resp.status, headers=proxy_headers, text=html, content_type="text/html")
+                return web.Response(status=resp.status, headers=html_headers, text=html, content_type="text/html")
             return web.Response(status=resp.status, headers=proxy_headers, body=content)
 
 
