@@ -1,10 +1,10 @@
 ![Hermes Agent](https://raw.githubusercontent.com/NousResearch/hermes-agent/main/assets/banner.png)
 
-# Deploy and Host Hermes Agent (with Official Dashboard) on Railway
+# Deploy Your Own Hermes Agent
 
 Hermes Agent is an open-source AI agent by Nous Research with tool use, persistent memory, scheduled tasks, and multi-platform messaging. This template deploys the full agent with its official web dashboard, a Telegram/Discord/Slack messaging gateway, password-protected login, and automatic updates.
 
-## About Hosting Hermes Agent (with Official Dashboard)
+## About
 
 This template gives you a fully managed Hermes Agent accessible from your browser. Everything is configured through the web dashboard after deploy — add API keys, connect messaging platforms, manage sessions, view analytics, and schedule cron jobs without ever touching a terminal. The messaging gateway runs alongside the dashboard and automatically restarts when you change settings. A Railway volume keeps your data across redeploys.
 
@@ -50,7 +50,7 @@ Attach a Railway volume so your config, sessions, and memories survive redeploys
 - Manage your agent from any browser — configure models, API keys, sessions, and analytics through the dashboard
 - Schedule recurring AI tasks with cron jobs and monitor usage and costs
 
-## Dependencies for Hermes Agent (with Official Dashboard) Hosting
+## Dependencies
 
 - At least one LLM provider API key ([OpenRouter](https://openrouter.ai/), [Anthropic](https://console.anthropic.com/), [OpenAI](https://platform.openai.com/), or [DeepSeek](https://platform.deepseek.com/))
 - A Telegram, Discord, or Slack bot token (if using messaging platforms)
@@ -62,8 +62,6 @@ Attach a Railway volume so your config, sessions, and memories survive redeploys
 - [Telegram BotFather](https://t.me/BotFather) (for Telegram setup)
 - [OpenRouter](https://openrouter.ai/) (recommended LLM provider)
 
-## Why Deploy Hermes Agent (with Official Dashboard) on Railway?
+## Why Use Railway?
 
 Railway is a singular platform to deploy your infrastructure stack. Railway will host your infrastructure so you don't have to deal with configuration, while allowing you to vertically and horizontally scale it.
-
-By deploying Hermes Agent (with Official Dashboard) on Railway, you are one step closer to supporting a complete full-stack application with minimal burden. Host your servers, databases, AI agents, and more on Railway.
