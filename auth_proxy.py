@@ -54,14 +54,14 @@ LOGIN_HTML = """<!DOCTYPE html>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #111110;
-    --surface: #1a1a18;
+    --bg: #0a0f14;
+    --surface: #111920;
     --border: rgba(255,255,255,0.06);
-    --border-focus: rgba(196,172,128,0.4);
-    --text: #e8e6e1;
-    --text-muted: #807d74;
-    --accent: #c4ac80;
-    --accent-dim: rgba(196,172,128,0.1);
+    --border-focus: rgba(45,212,191,0.4);
+    --text: #e0f0f0;
+    --text-muted: #7899aa;
+    --accent: #2dd4bf;
+    --accent-dim: rgba(45,212,191,0.1);
     --error-bg: rgba(180,60,60,0.1);
     --error-border: rgba(180,60,60,0.25);
     --error-text: #d4908a;
@@ -82,7 +82,7 @@ LOGIN_HTML = """<!DOCTYPE html>
     position: fixed;
     inset: 0;
     background:
-      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(196,172,128,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(45,212,191,0.04) 0%, transparent 60%),
       radial-gradient(ellipse 60% 80% at 80% 100%, rgba(255,255,255,0.02) 0%, transparent 50%);
     pointer-events: none;
   }
