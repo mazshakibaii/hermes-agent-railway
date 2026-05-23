@@ -15,6 +15,12 @@ if [ "$AUTO_UPDATE" = "true" ]; then
   fi
 fi
 
-hermes dashboard --host 127.0.0.1 --port 9119 --no-open &
-
-exec python /auth_proxy.py
+# Check if running in API-only mode
+if [[ "${HERMES_MODE}" == "api-only" ]] || [[ "$@" == *"api-only"* ]]; then
+  echo "Starting Hermes in API-only mode..."
+  exec hermes gateway run --api-only
+else
+  echo "Starting Hermes in gateway mode with dashboard..."
+  hermes dashboard --host 127.0.0.1 --port 9119 --no-open &
+  exec python /auth_proxy.py
+fi
